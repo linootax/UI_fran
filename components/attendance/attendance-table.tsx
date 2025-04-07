@@ -64,6 +64,11 @@ const columns: ColumnDef<AttendanceRecord>[] = [
     header: "Alumno",
     cell: ({ row }) => {
       const student = row.original.studentId;
+      if (!student) {
+        return (
+          <div className="text-muted-foreground">Alumno no encontrado</div>
+        );
+      }
       return (
         <div className="flex flex-col">
           <span className="font-medium">{student.name}</span>

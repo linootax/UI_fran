@@ -152,8 +152,7 @@ export function InventoryTable() {
       });
     } catch (err: unknown) {
       console.error("Error creating item:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al crear el item";
+      const errorMessage = "Error al crear el item";
       toast({
         variant: "destructive",
         title: "Error",
@@ -195,8 +194,7 @@ export function InventoryTable() {
       setSelectedItem(null);
     } catch (err: unknown) {
       console.error("Error updating item:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al actualizar el item";
+      const errorMessage = "Error al actualizar el item";
       toast({
         variant: "destructive",
         title: "Error",
@@ -217,8 +215,7 @@ export function InventoryTable() {
       });
     } catch (err: unknown) {
       console.error("Error deleting item:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al eliminar el item";
+      const errorMessage = "Error al eliminar el item";
       toast({
         variant: "destructive",
         title: "Error",
@@ -304,16 +301,7 @@ export function InventoryTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => {
-                  toast({
-                    title: "Detalles del Item",
-                    description: `${item.name} - ${item.description}`,
-                  });
-                }}
-              >
-                Ver detalles
-              </DropdownMenuItem>
+
               <DropdownMenuItem
                 onClick={() => {
                   setSelectedItem(item);
@@ -377,7 +365,6 @@ export function InventoryTable() {
               <SelectItem value="Mobiliario">Mobiliario</SelectItem>
               <SelectItem value="Papelería">Papelería</SelectItem>
               <SelectItem value="Vestimenta">Vestimenta</SelectItem>
-              <SelectItem value="Deportes">Deportes</SelectItem>
             </SelectContent>
           </Select>
           <Input
@@ -436,7 +423,6 @@ export function InventoryTable() {
                     <SelectItem value="Mobiliario">Mobiliario</SelectItem>
                     <SelectItem value="Papelería">Papelería</SelectItem>
                     <SelectItem value="Vestimenta">Vestimenta</SelectItem>
-                    <SelectItem value="Deportes">Deportes</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -499,17 +485,12 @@ export function InventoryTable() {
                     <SelectValue placeholder="Seleccionar ubicación" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Almacén A">Almacén A</SelectItem>
-                    <SelectItem value="Almacén B">Almacén B</SelectItem>
-                    <SelectItem value="Almacén C">Almacén C</SelectItem>
-                    <SelectItem value="Almacén D">Almacén D</SelectItem>
-                    <SelectItem value="Sala de Cómputo">
-                      Sala de Cómputo
+                    <SelectItem value="CC Diga Center">
+                      CC Diga Center
                     </SelectItem>
-                    <SelectItem value="Sala de Conferencias">
-                      Sala de Conferencias
+                    <SelectItem value="Sede La soledad">
+                      Sede La Soledad
                     </SelectItem>
-                    <SelectItem value="Gimnasio">Gimnasio</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -578,7 +559,6 @@ export function InventoryTable() {
                       <SelectItem value="Mobiliario">Mobiliario</SelectItem>
                       <SelectItem value="Papelería">Papelería</SelectItem>
                       <SelectItem value="Vestimenta">Vestimenta</SelectItem>
-                      <SelectItem value="Deportes">Deportes</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

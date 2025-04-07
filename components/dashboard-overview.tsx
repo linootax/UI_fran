@@ -25,8 +25,9 @@ export function DashboardOverview() {
   const [studentGrowth, setStudentGrowth] = useState<number>(0);
   const [attendanceGrowth, setAttendanceGrowth] = useState<number>(0);
   const [revenueGrowth, setRevenueGrowth] = useState<number>(0);
+  const [revenueChange, setRevenueChange] = useState<number>(0);
   const [inventoryGrowth, setInventoryGrowth] = useState<number>(0);
-  const [totalInventory, setTotalInventory] = useState<number>(0);
+  const [availableInventory, setAvailableInventory] = useState<number>(0);
 
   // Get current date and last month's date
   const currentDate = new Date();
@@ -87,18 +88,25 @@ export function DashboardOverview() {
           lastMonth.toISOString().split("T")[0],
           startOfMonth.toISOString().split("T")[0]
         );
-        const revenueChange =
-          ((currentMonthPayments.totalAmount - lastMonthPayments.totalAmount) /
-            lastMonthPayments.totalAmount) *
-          100;
-        setRevenueGrowth(revenueChange);
+        const revenueChangeValue =
+          lastMonthPayments.totalAmount > 0
+            ? ((currentMonthPayments.totalAmount -
+                lastMonthPayments.totalAmount) /
+                lastMonthPayments.totalAmount) *
+              100
+            : 100;
+        setRevenueGrowth(currentMonthPayments.totalAmount);
+        setRevenueChange(revenueChangeValue);
 
         // Calculate inventory statistics
-        const newItems = inventory.filter(
+        const availableItems = inventory.filter(
+          (item: InventoryItem) => item.status === "Disponible"
+        );
+        const newAvailableItems = availableItems.filter(
           (item: InventoryItem) => new Date(item.lastUpdated) >= startOfMonth
         ).length;
-        setInventoryGrowth(newItems);
-        setTotalInventory(inventory.length);
+        setInventoryGrowth(newAvailableItems);
+        setAvailableInventory(availableItems.length);
       } catch (error) {
         console.error("Error calculating dashboard statistics:", error);
       }
@@ -180,22 +188,24 @@ export function DashboardOverview() {
                   }).format(revenueGrowth)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {revenueGrowth > 0 ? "+" : ""}
-                  {revenueGrowth.toFixed(1)}% respecto al mes anterior
+                  {revenueChange > 0 ? "+" : ""}
+                  {revenueChange.toFixed(1)}% respecto al mes anterior
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Inventario Activo
+                  Inventario Disponible
                 </CardTitle>
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{totalInventory} items</div>
+                <div className="text-2xl font-bold">
+                  {availableInventory} items disponibles
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +{inventoryGrowth} items nuevos este mes
+                  +{inventoryGrowth} items disponibles nuevos este mes
                 </p>
               </CardContent>
             </Card>

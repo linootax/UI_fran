@@ -21,7 +21,7 @@ export function RecentPayments() {
         <div key={payment._id} className="flex items-center">
           <div className="space-y-1">
             <p className="text-sm font-medium leading-none">
-              {payment.studentId.name}
+              {payment.studentId?.name || "Estudiante no encontrado"}
             </p>
             <p className="text-sm text-muted-foreground">
               {format(new Date(payment.date), "PPP", { locale: es })}

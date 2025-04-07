@@ -4,6 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   BookOpen,
@@ -68,8 +69,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex flex-col h-full">
             <div className="px-6 py-4 border-b">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-6 w-6" />
-                <span className="font-bold text-xl">Sistema Escolar</span>
+                <Image
+                  src="/logo.svg"
+                  alt="Logo"
+                  width={24}
+                  height={24}
+                  className="dark:invert"
+                />
+                <span className="font-bold text-sm">
+                  Escuela de Formacion Artistica Miss Dabetza
+                </span>
               </div>
             </div>
             <div className="flex-1 overflow-auto py-2">
@@ -106,8 +115,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="flex flex-col h-full border-r bg-background">
           <div className="px-6 py-4 border-b">
             <div className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6" />
-              <span className="font-bold text-xl">Sistema Escolar </span>
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                width={50}
+                height={50}
+                className="dark:invert"
+              />
+              <span className="font-bold text-sm">
+                Escuela de Formacion Artistica Miss Dabetza
+              </span>
             </div>
           </div>
           <div className="flex-1 overflow-auto py-2">
