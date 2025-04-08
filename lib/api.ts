@@ -48,7 +48,7 @@ export interface Payment {
   date: string;
   concept: string;
   status: "Pagado" | "Pendiente" | "Cancelado";
-  paymentMethod: "Efectivo" | "Tarjeta" | "Transferencia";
+  paymentMethod: "Efectivo" | "Transferencia";
   receiptNumber: string;
 }
 

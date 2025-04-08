@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -18,7 +18,14 @@ import { usePayments } from "@/hooks/usePayments";
 import { useInventory } from "@/hooks/useInventory";
 import { Loading } from "@/components/ui/loading";
 import { Error } from "@/components/ui/error";
-import { InventoryItem } from "@/lib/api";
+import { InventoryItem, Student, Payment } from "@/lib/api";
+
+interface PaymentStats {
+  total: number;
+  paid: number;
+  pending: number;
+  cancelled: number;
+}
 
 export function DashboardOverview() {
   // States for storing monthly comparisons
@@ -26,20 +33,24 @@ export function DashboardOverview() {
   const [attendanceGrowth, setAttendanceGrowth] = useState<number>(0);
   const [revenueGrowth, setRevenueGrowth] = useState<number>(0);
   const [revenueChange, setRevenueChange] = useState<number>(0);
+  const [paymentStats, setPaymentStats] = useState<PaymentStats>({
+    total: 0,
+    paid: 0,
+    pending: 0,
+    cancelled: 0,
+  });
   const [inventoryGrowth, setInventoryGrowth] = useState<number>(0);
   const [availableInventory, setAvailableInventory] = useState<number>(0);
 
   // Get current date and last month's date
-  const currentDate = new Date();
-  const lastMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() - 1,
-    1
+  const currentDate = useMemo(() => new Date(), []);
+  const lastMonth = useMemo(
+    () => new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
+    [currentDate]
   );
-  const startOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
+  const startOfMonth = useMemo(
+    () => new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+    [currentDate]
   );
 
   // Hooks
@@ -49,10 +60,64 @@ export function DashboardOverview() {
     error: studentsError,
   } = useStudents();
   const { getAttendanceByDateRange } = useAttendance();
-  const { getPaymentsSummaryByDateRange } = usePayments();
+  const { payments } = usePayments();
   const { inventory } = useInventory();
 
-  // Calculate statistics
+  // Calculate payment statistics
+  useEffect(() => {
+    if (!payments.length) return;
+
+    // Filter payments for current month
+    const currentMonthPayments = payments.filter((payment: Payment) => {
+      const paymentDate = new Date(payment.date);
+      return paymentDate >= startOfMonth && paymentDate <= currentDate;
+    });
+
+    // Calculate current month stats
+    const stats = currentMonthPayments.reduce(
+      (acc: PaymentStats, payment: Payment) => {
+        acc.total += payment.amount;
+        if (payment.status === "Pagado") acc.paid += payment.amount;
+        if (payment.status === "Pendiente") acc.pending += payment.amount;
+        if (payment.status === "Cancelado") acc.cancelled += payment.amount;
+        return acc;
+      },
+      {
+        total: 0,
+        paid: 0,
+        pending: 0,
+        cancelled: 0,
+      }
+    );
+
+    // Filter payments for last month
+    const lastMonthPayments = payments.filter((payment: Payment) => {
+      const paymentDate = new Date(payment.date);
+      return paymentDate >= lastMonth && paymentDate < startOfMonth;
+    });
+
+    // Calculate last month stats
+    const lastMonthStats = lastMonthPayments.reduce(
+      (acc: PaymentStats, payment: Payment) => {
+        if (payment.status === "Pagado") acc.paid += payment.amount;
+        return acc;
+      },
+      { total: 0, paid: 0, pending: 0, cancelled: 0 }
+    );
+
+    // Calculate change
+    const changeValue =
+      lastMonthStats.paid > 0
+        ? ((stats.paid - lastMonthStats.paid) / lastMonthStats.paid) * 100
+        : 100;
+
+    // Update all payment-related states at once
+    setPaymentStats(stats);
+    setRevenueGrowth(stats.paid);
+    setRevenueChange(changeValue);
+  }, [payments, startOfMonth, currentDate, lastMonth]);
+
+  // Calculate attendance and inventory statistics
   useEffect(() => {
     const calculateStats = async () => {
       try {
@@ -72,31 +137,8 @@ export function DashboardOverview() {
               currentMonthAttendance.length) *
             100
           : 0;
-        const lastAttendanceRate = lastMonthAttendance.length
-          ? (lastMonthAttendance.filter((a) => a.status === "Presente").length /
-              lastMonthAttendance.length) *
-            100
-          : 0;
-        setAttendanceGrowth(currentAttendanceRate);
 
-        // Calculate revenue growth
-        const currentMonthPayments = await getPaymentsSummaryByDateRange(
-          startOfMonth.toISOString().split("T")[0],
-          currentDate.toISOString().split("T")[0]
-        );
-        const lastMonthPayments = await getPaymentsSummaryByDateRange(
-          lastMonth.toISOString().split("T")[0],
-          startOfMonth.toISOString().split("T")[0]
-        );
-        const revenueChangeValue =
-          lastMonthPayments.totalAmount > 0
-            ? ((currentMonthPayments.totalAmount -
-                lastMonthPayments.totalAmount) /
-                lastMonthPayments.totalAmount) *
-              100
-            : 100;
-        setRevenueGrowth(currentMonthPayments.totalAmount);
-        setRevenueChange(revenueChangeValue);
+        setAttendanceGrowth(currentAttendanceRate);
 
         // Calculate inventory statistics
         const availableItems = inventory.filter(
@@ -113,7 +155,13 @@ export function DashboardOverview() {
     };
 
     calculateStats();
-  }, [getAttendanceByDateRange, getPaymentsSummaryByDateRange, inventory]);
+  }, [
+    getAttendanceByDateRange,
+    inventory,
+    startOfMonth,
+    currentDate,
+    lastMonth,
+  ]);
 
   if (studentsLoading) {
     return <Loading />;
@@ -130,14 +178,13 @@ export function DashboardOverview() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Bienvenido al sistema de gestión escolar
+          Bienvenido al sistema de gestión administrativa
         </p>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Vista General</TabsTrigger>
-          <TabsTrigger value="analytics">Análisis</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -185,12 +232,45 @@ export function DashboardOverview() {
                   {new Intl.NumberFormat("es-MX", {
                     style: "currency",
                     currency: "MXN",
-                  }).format(revenueGrowth)}
+                    maximumFractionDigits: 0,
+                  }).format(paymentStats.paid)}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {revenueChange > 0 ? "+" : ""}
                   {revenueChange.toFixed(1)}% respecto al mes anterior
                 </p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs text-muted-foreground flex justify-between">
+                    <span>Pagos pendientes:</span>
+                    <span>
+                      {new Intl.NumberFormat("es-MX", {
+                        style: "currency",
+                        currency: "MXN",
+                        maximumFractionDigits: 0,
+                      }).format(paymentStats.pending)}
+                    </span>
+                  </p>
+                  <p className="text-xs text-emerald-600 flex justify-between">
+                    <span>Total cobrado:</span>
+                    <span>
+                      {new Intl.NumberFormat("es-MX", {
+                        style: "currency",
+                        currency: "MXN",
+                        maximumFractionDigits: 0,
+                      }).format(paymentStats.paid)}
+                    </span>
+                  </p>
+                  <p className="text-xs text-red-600 flex justify-between">
+                    <span>Pagos cancelados:</span>
+                    <span>
+                      {new Intl.NumberFormat("es-MX", {
+                        style: "currency",
+                        currency: "MXN",
+                        maximumFractionDigits: 0,
+                      }).format(paymentStats.cancelled)}
+                    </span>
+                  </p>
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -234,21 +314,6 @@ export function DashboardOverview() {
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-        <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Análisis de Datos</CardTitle>
-              <CardDescription>
-                Visualización de métricas y tendencias
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-96 flex items-center justify-center">
-              <p className="text-muted-foreground">
-                Aquí se mostrarán gráficos y análisis detallados
-              </p>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

@@ -427,7 +427,7 @@ export function StudentsTable() {
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="grade" className="text-right">
-                      Grado
+                      Nivel
                     </Label>
                     <Select
                       value={newStudent.grade}
@@ -440,7 +440,7 @@ export function StudentsTable() {
                       required
                     >
                       <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Seleccionar grado" />
+                        <SelectValue placeholder="Seleccionar nivel" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Maternal">Maternal</SelectItem>
@@ -610,7 +610,7 @@ export function StudentsTable() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-grade" className="text-right">
-                  Grado
+                  Nivel
                 </Label>
                 <Select
                   value={selectedStudent?.grade || ""}
@@ -622,7 +622,7 @@ export function StudentsTable() {
                   required
                 >
                   <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Seleccionar grado" />
+                    <SelectValue placeholder="Seleccionar nivel" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Maternal">Maternal</SelectItem>

@@ -85,7 +85,7 @@ export function PaymentsTable() {
     amount: "",
     concept: "",
     status: "Pendiente" as "Pagado" | "Pendiente" | "Cancelado",
-    paymentMethod: "Efectivo" as "Efectivo" | "Tarjeta" | "Transferencia",
+    paymentMethod: "Efectivo" as "Efectivo" | "Transferencia",
     receiptNumber: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -170,7 +170,7 @@ export function PaymentsTable() {
     },
     {
       accessorKey: "receiptNumber",
-      header: "No. Recibo",
+      header: "Referencia",
     },
     {
       id: "actions",
@@ -537,9 +537,7 @@ export function PaymentsTable() {
                   </Label>
                   <Select
                     value={newPayment.paymentMethod}
-                    onValueChange={(
-                      value: "Efectivo" | "Tarjeta" | "Transferencia"
-                    ) =>
+                    onValueChange={(value: "Efectivo" | "Transferencia") =>
                       setNewPayment((prev) => ({
                         ...prev,
                         paymentMethod: value,
@@ -552,7 +550,7 @@ export function PaymentsTable() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Efectivo">Efectivo</SelectItem>
-                      <SelectItem value="Tarjeta">Tarjeta</SelectItem>
+
                       <SelectItem value="Transferencia">
                         Transferencia
                       </SelectItem>
@@ -561,7 +559,7 @@ export function PaymentsTable() {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="receiptNumber" className="text-right">
-                    No. Recibo
+                    Referencia
                   </Label>
                   <Input
                     id="receiptNumber"
@@ -823,14 +821,14 @@ export function PaymentsTable() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Efectivo">Efectivo</SelectItem>
-                    <SelectItem value="Tarjeta">Tarjeta</SelectItem>
+
                     <SelectItem value="Transferencia">Transferencia</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-receiptNumber" className="text-right">
-                  No. Recibo
+                  Referencia
                 </Label>
                 <Input
                   id="edit-receiptNumber"
