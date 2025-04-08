@@ -100,12 +100,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 ))}
               </nav>
             </div>
-            <div className="border-t p-4">
-              <Button variant="outline" className="w-full justify-start gap-2">
-                <LogOut className="h-4 w-4" />
-                Cerrar Sesión
-              </Button>
-            </div>
           </div>
         </SheetContent>
       </Sheet>
@@ -145,12 +139,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               ))}
             </nav>
           </div>
-          <div className="border-t p-4">
-            <Button variant="outline" className="w-full justify-start gap-2">
-              <LogOut className="h-4 w-4" />
-              Cerrar Sesión
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -169,9 +157,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex-1" />
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button variant="outline" size="sm">
-              Mi Perfil
-            </Button>
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-6 md:p-8">{children}</main>
